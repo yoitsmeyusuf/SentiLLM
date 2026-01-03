@@ -1,43 +1,98 @@
-SENTINLLM_PROJECT/
-│
-├── .env                  # API Key'ler burada
-├── requirements.txt      # Kütüphaneler
-├── main.py               # ORKESTRA ŞEFİ (Her şeyi burada birleştireceğiz)
-│
+# 🛡️ SentiLLM - AI-Powered CVE Security Agent
+
+Fine-tuned Llama-3-8B model ile otomatik güvenlik açığı analizi ve GitHub entegrasyonu.
+
+## 🎯 Ne Yapar?
+
+1. **CVE İzleme** - NVD API'den güncel güvenlik açıklarını çeker
+2. **Repo Tarama** - GitHub repolarındaki bağımlılıkları analiz eder
+3. **AI Analiz** - SentiLLM ile risk değerlendirmesi yapar
+4. **Otomatik Issue** - Kritik açıklar için GitHub Issue oluşturur
+
+## 🏗️ Mimari
+
+```
+┌─────────────┐     ┌─────────────┐     ┌─────────────┐
+│   NVD API   │────▶│  RAG Memory │────▶│  SentiLLM   │
+│  (CVE Data) │     │  (ChromaDB) │     │  (Llama-3)  │
+└─────────────┘     └─────────────┘     └──────┬──────┘
+                                               │
+                                               ▼
+                                        ┌─────────────┐
+                                        │   GitHub    │
+                                        │   Issues    │
+                                        └─────────────┘
+```
+
+## 🚀 Kurulum
+
+```bash
+git clone https://github.com/yoitsmeyusuf/SentiLLM.git
+cd SentiLLM
+
+# Python 3.12 önerilir
+python -m venv .venv
+.venv\Scripts\activate  # Windows
+
+pip install -r requirements.txt
+
+# GPU desteği (opsiyonel)
+pip install torch --index-url https://download.pytorch.org/whl/cu121
+```
+
+## ⚙️ Konfigürasyon
+
+`.env` dosyası:
+```env
+GITHUB_TOKEN=ghp_xxxxxxxxxxxx
+OPENAI_API_KEY=sk-xxxx  # Fallback (opsiyonel)
+```
+
+## 📦 Kullanım
+
+```python
+from modules.rag_memory import RAGMemory
+from modules.ai_agent import SecurityAgent
+
+# Repo tara
+memory = RAGMemory()
+result = memory.ingest_github_repo("https://github.com/user/repo", recursive=True)
+
+# CVE analiz et
+agent = SecurityAgent(sentillm_model_path="yoitsmeyusuf/sentillm-cve-analyzer-lora")
+analysis = agent.analyze_vulnerability(cve_data, dependency)
+```
+
+## 🧪 Test
+
+```bash
+python test_pipeline.py        # Dry-run
+python test_pipeline.py --live # Gerçek Issue oluştur
+```
+
+## 🤖 Model
+
+| | |
+|---|---|
+| **Base** | meta-llama/Meta-Llama-3-8B |
+| **Fine-tuned** | yoitsmeyusuf/sentillm-cve-analyzer-lora |
+| **Method** | QLoRA (r=32) + NEFTune |
+
+## 📁 Yapı
+
+```
+SentiLLM/
 ├── modules/
-│   ├── __init__.py
-│   ├── cve_monitor.py    # (Yazdığın kod) NVD'yi dinleyen kulak
-│   ├── rag_memory.py     # GitHub kodlarını vektöre çeviren hafıza
-│   └── ai_agent.py       # (Şimdi yazacağımız) Karar veren beyin
-│
-└── data/                 # Geçici veriler (ChromaDB vb.)
+│   ├── ai_agent.py      # SentiLLM + GitHub Agent
+│   └── rag_memory.py    # Repo tarama + ChromaDB
+├── main.py              # NVD API entegrasyonu
+├── test_pipeline.py     # E2E test
+└── requirements.txt
+```
 
+## 📄 Lisans
 
-1. Sistem Mimarisi (Architecture)
+MIT
 
-Akış Şeması:
-
-    The Watchtower (Gözlemci): NIST NVD API'sini veya RSS feedlerini dinler. Yeni bir CVE düştüğü an yakalar.
-
-    The Context (Vektör Hafıza): Kullanıcının GitHub reposunu (özellikle requirements.txt, pom.xml, package.json ve kritik fonksiyonları) okur ve vektör veritabanına gömer.
-
-    The Brain (Analiz - RAG): Yeni gelen CVE ile projedeki kod parçalarını eşleştirir. LLM'e sorar: "Bu CVE bu projeyi vurur mu?"
-
-    The Agent (Eylem): Eğer cevap "Evet" ise, GitHub API'sini kullanarak otomatik Issue veya Pull Request açar.
-
-2. Teknoloji Yığını (Tech Stack)
-
-
-    Backend: Python (FastAPI veya basit bir script).
-
-    AI/LLM: Llama-3 (RunPod üzerinde) veya hızlı test için OpenAI API.
-
-    Orchestration: LangChain (RAG ve Agent yapısı için standart, öğrenmesi kolay).
-
-    Vector DB: ChromaDB
-
-    External API:
-
-        PyGithub (GitHub işlemleri için).
-
-        NIST NVD API (CVE verileri için).
+---
+*Built with 🦙 Llama-3 and ❤️*
