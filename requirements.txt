@@ -1,0 +1,19 @@
+# --- AI & LLM Framework ---
+langchain
+langchain-community
+langchain-openai  # OpenAI API kullanacaksan
+langchain-huggingface  # Açık kaynak model/embedding kullanacaksan
+
+# --- Vector Database (Hafıza) ---
+chromadb  # Kod parçalarını vektör olarak tutmak için
+sentence-transformers  # Metinleri vektöre çevirmek için (Embeddings)
+
+# --- External APIs & Tools ---
+PyGithub  # GitHub Issue/PR açmak için
+requests  # NIST CVE verisini çekmek için
+gitpython # Repoları klonlamak gerekirse diye
+
+# --- Backend & Environment ---
+fastapi   # API sunucusu (Demo için)
+uvicorn   # Sunucuyu çalıştırmak için
+python-dotenv  # API Key'lerini gizlemek için (.env)
